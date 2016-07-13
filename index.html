@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TTS 2006 Zone System</title>
+
+  <meta charset="utf-8" />
+  <script src='https://api.mapbox.com/mapbox-gl-js/v0.20.0/mapbox-gl.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v0.20.0/mapbox-gl.css' rel='stylesheet' />
+</head>
+<body>
+
+<style>
+  .mapboxgl-popup {
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;}
+
+  body { margin:0; padding:0; }
+  #map { position:absolute; top:30px; bottom:0; left:0.25%; width:99.5%; }
+
+#overlay {
+     visibility: visible;
+     padding: 0px 5px 0px 5px;
+     background: #fff;
+     position: absolute;
+     left: 40%;
+     top: 40%;
+     width:20%;
+     height:20%%;
+     text-align:center;
+     font-family: 'Open Sans', sans-serif;
+     border: 3px solid gray;
+     z-index: 1000;
+}
+
+      #title {
+        background: #77AD1C;
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: 0.25%;
+        border-radius: 3px;
+        width: 99.5%;
+        height: 30px;
+        font-family: 'Open Sans', sans-serif;
+        text-indent: 5px;
+        font-weight: bold;
+        color: #fff;
+        font-size: 18pt;
+    }         
+
+</style>
+<nav id="title">TTS 2006 Zone System</nav>
+
+<div id="map"></div>
+
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYWRhbXciLCJhIjoiMzE0YWIyOWQzZGI2Y2UzMWY3ZDZjNTRjYWVlMjQ2ZTEifQ.joygBm5WZ_HuJEnNMc48nA';
+      var map = new mapboxgl.Map({
+          container: 'map',
+          center: [-79.44, 43.69],
+          zoom: 9,
+          style: 'mapbox://styles/mapbox/streets-v9'
+        });
+
+        // Add zoom and rotation controls to the map.
+    map.addControl(new mapboxgl.Navigation());
+
+
+var sourceObj = new mapboxgl.GeoJSONSource({
+      data:'ttszones.geojson'
+});
+
+map.on('load', function() {
+  map.addSource('tts_source', sourceObj);
+
+  map.addLayer({
+    id: 'tts',
+    source: 'tts_source',
+    type: 'fill',
+    paint: {
+      'fill-antialias': true,
+      'fill-color': 'rgba(119, 182, 146, 0.4)',
+      'fill-outline-color': '#333',
+      'fill-opacity': 0.5
+    }
+
+  });    
+
+});
+
+
+// When a click event occurs near a marker icon, open a popup at the location of
+// the feature, with description HTML from its properties.
+map.on('click', function (e) {
+    var features = map.queryRenderedFeatures(e.point, { layers: ['tts'] });
+    if (!features.length) {
+        return;
+    }
+
+    var feature = features[0];
+
+    var popup = new mapboxgl.Popup()
+        .setLngLat(map.unproject(e.point))
+        .setHTML('TTS 06 Zone: ' + feature.properties.GTA06)
+        .addTo(map);
+});
+
+// Use the same approach as above to indicate that the symbols are clickable
+// by changing the cursor style to 'pointer'.
+map.on('mousemove', function (e) {
+    var features = map.queryRenderedFeatures(e.point, { layers: ['tts'] });
+    map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+});
+
+</script>
+</body>
+</html>
